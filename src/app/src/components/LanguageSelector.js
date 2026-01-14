@@ -1,18 +1,16 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { FaGlobe, FaTimes } from 'react-icons/fa'
+import { FaGlobe, FaTimes, FaInfoCircle } from 'react-icons/fa'
 
 export default function LanguageSelector() {
   const [showPopup, setShowPopup] = useState(false)
   const [selectedLang, setSelectedLang] = useState('en')
 
   useEffect(() => {
-    // پہلے سے سلیکٹ شدہ زبان چیک کریں
     const savedLang = localStorage.getItem('lexbridge-language')
     if (savedLang) {
       setSelectedLang(savedLang)
     } else {
-      // پہلی بار آنے پر پاپ اپ دکھائیں
       const timer = setTimeout(() => {
         setShowPopup(true)
       }, 1000)
@@ -30,8 +28,23 @@ export default function LanguageSelector() {
     setSelectedLang(langCode)
     localStorage.setItem('lexbridge-language', langCode)
     setShowPopup(false)
-    alert(`Language set to: ${languages.find(l => l.code === langCode)?.name}`)
   }
+
+  // زبان کے مطابق وارننگ پیغام
+  const warningMessages = {
+    en: "This is a professional paid platform. Advance payment is mandatory for all services.",
+    ur: "یہ ایک پیشہ ورانہ پیڈ پلیٹ فارم ہے۔ تمام خدمات کے لیے پیشگی ادائیگی لازمی ہے۔",
+    ar: "هذه منصة مهنية مدفوعة. الدفع المقدم إلزامي لجميع الخدمات."
+  }
+
+  const buttonTexts = {
+    en: { skip: "Skip for now", change: "Change language anytime" },
+    ur: { skip: "ابھی چھوڑ دیں", change: "کسی وقت بھی زبان تبدیل کریں" },
+    ar: { skip: "تخطي الآن", change: "غير اللغة في أي وقت" }
+  }
+
+  const currentWarning = warningMessages[selectedLang] || warningMessages.en
+  const currentButtonText = buttonTexts[selectedLang] || buttonTexts.en
 
   return (
     <>
@@ -56,7 +69,7 @@ export default function LanguageSelector() {
               <div className="flex items-center gap-3">
                 <FaGlobe className="text-2xl text-blue-900" />
                 <div>
-                  <h2 className="text-xl font-bold">Select Language</h2>
+                  <h2 className="text-xl font-bold">Select Language | زبان منتخب کریں | اختر اللغة</h2>
                   <p className="text-gray-600 text-sm">Please choose your preferred language</p>
                 </div>
               </div>
@@ -68,13 +81,24 @@ export default function LanguageSelector() {
               </button>
             </div>
 
+            {/* اہم وارننگ */}
+            <div className="mx-6 mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+              <div className="flex items-start">
+                <FaInfoCircle className="text-yellow-600 mt-1 mr-2" />
+                <div>
+                  <p className="text-yellow-800 font-medium">Important Notice:</p>
+                  <p className="text-yellow-700 text-sm mt-1">{currentWarning}</p>
+                </div>
+              </div>
+            </div>
+
             {/* زبان کے آپشنز */}
             <div className="p-6 space-y-3">
               {languages.map((lang) => (
                 <button
                   key={lang.code}
                   onClick={() => handleLanguageSelect(lang.code)}
-                  className={`w-full p-4 rounded-xl border-2 flex items-center justify-between ${selectedLang === lang.code ? 'border-blue-900 bg-blue-50' : 'border-gray-200'}`}
+                  className={`w-full p-4 rounded-xl border-2 flex items-center justify-between ${selectedLang === lang.code ? 'border-blue-900 bg-blue-50' : 'border-gray-200 hover:border-blue-900'}`}
                 >
                   <div className="text-left">
                     <div className="font-bold text-lg">{lang.name}</div>
@@ -93,11 +117,18 @@ export default function LanguageSelector() {
                 onClick={() => setShowPopup(false)}
                 className="w-full py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium"
               >
-                Skip for now
+                {currentButtonText.skip}
               </button>
               <p className="text-center text-gray-500 text-sm mt-3">
-                You can change language anytime from top-right button
+                {currentButtonText.change}
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}              </p>
             </div>
           </div>
         </div>
